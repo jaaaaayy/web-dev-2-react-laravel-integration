@@ -1,35 +1,71 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect, useState } from "react";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [students, setStudents] = useState([]);
+
+  useEffect(() => {
+    async function fetchStudents() {
+      const response = await fetch("http://127.0.0.1:8000/api/students");
+
+      const results = await response.json();
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch students.");
+      }
+
+      setStudents(results.data);
+    }
+
+    try {
+      fetchStudents();
+    } catch (error) {
+      console.log(error.message);
+    }
+  }, []);
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div className="max-w-[1440px] mx-auto p-4 space-y-4">
+      <header>
+        <p className="text-2xl">Jay Vallesin</p>
+        <p className="text-2xl">Section B</p>
+      </header>
+      <table>
+        <thead>
+          <tr>
+            <th className="border p-2">ID</th>
+            <th className="border p-2">Name</th>
+            <th className="border p-2">Age</th>
+            <th className="border p-2">Gender</th>
+            <th className="border p-2">Date of birth</th>
+            <th className="border p-2">Created At</th>
+            <th className="border p-2">Updated At</th>
+          </tr>
+        </thead>
+        <tbody>
+          {students &&
+            students.map((student) => (
+              <tr key={student.id}>
+                <td className="border p-2">{student.id}</td>
+                <td className="border p-2">
+                  {student.last_name}
+                  {student.middle_name && " " + student.middle_name}{" "}
+                  {student.first_name}
+                </td>
+                <td className="border p-2">{student.age}</td>
+                <td className="border p-2">{student.gender}</td>
+                <td className="border p-2">{student.date_of_birth}</td>
+                <td className="border p-2">
+                  {new Date(student.created_at).toLocaleString()}
+                </td>
+                <td className="border p-2">
+                  {new Date(student.updated_at).toLocaleString()}
+                </td>
+              </tr>
+            ))}
+        </tbody>
+      </table>
+    </div>
+  );
 }
 
-export default App
+export default App;
